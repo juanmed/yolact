@@ -593,7 +593,8 @@ def badhash(x):
     return x
 
 def evalimage(net:Yolact, path:str, save_path:str=None):
-    frame = torch.from_numpy(cv2.imread(path)).cuda().float()
+
+    print(type(path));temp = cv2.imread(path);print(type(temp),temp.shape);frame = torch.from_numpy(temp).cuda().float();print(path)
     batch = FastBaseTransform()(frame.unsqueeze(0))
     preds = net(batch)
 
