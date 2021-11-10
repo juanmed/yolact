@@ -40,4 +40,5 @@ python3 train.py \
  --config=${YOLACT_CONFIG_FULL} \
  --log_folder=${YOLACT_LOG_FOLDER} \
  --batch_size=${YOLACT_BATCH_SIZE} \
- --save_folder=${YOLACT_SAVE_FOLDER}/
+ --save_folder=${YOLACT_SAVE_FOLDER}\
+ --resume=interrupt
