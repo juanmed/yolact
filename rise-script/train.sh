@@ -41,4 +41,5 @@ python3 train.py \
  --log_folder=${YOLACT_LOG_FOLDER} \
  --batch_size=${YOLACT_BATCH_SIZE} \
  --save_folder=${YOLACT_SAVE_FOLDER}\
- --resume=interrupt
+ --resume=/repos/work/rise-yolact/weights/yolact_resnet50_max1024/yolact_resnet50_max1024_2499_10000.pth\
+ --validation_epoch=-1
