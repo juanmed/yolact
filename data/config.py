@@ -105,12 +105,12 @@ ul_aug_dataset = Config({
     'name': 'Unloading Augmented',
 
     # Training images and annotations
-    'train_images': '/repos/dataset/unloader_stacked/color/',
-    'train_info':   '/repos/dataset/unloader_stacked/unloader_stacked.json',
+    'train_images': '/repos/dataset/stacked_random_testworks/all_merged/images/train/',
+    'train_info':   '/repos/dataset/stacked_random_testworks/all_merged/annotations/train.json',
 
     # Validation images and annotations.
-    'valid_images': '/repos/dataset/minjae/',
-    'valid_info':   '/repos/dataset/minjae/annotations.json',
+    'valid_images': '/repos/dataset/stacked_random_testworks/all_merged/images/train/',
+    'valid_info':   '/repos/dataset/stacked_random_testworks/all_merged/annotations/realval.json',
 
     # Change Validation images and annotations to the testset when benchmark.
     # 'valid_images': './data/coco_ul_aug/test/',
@@ -120,12 +120,12 @@ ul_aug_dataset = Config({
     'has_gt': True,
 
     # A list of names for each of you classes.
-    'class_names': ['icebox', 'box', 'pouch' , 'sack', 'bottle'],
+    'class_names':['icebox', 'box', 'pouch', 'sack', 'bottle'],
 
     # COCO class ids aren't sequential, so this is a bandage fix. If your ids aren't sequential,
     # provide a map from category_id -> index in class_names + 1 (the +1 is there because it's 1-indexed).
-    # If not specified, this just assumes category ids start at 1 and increase sequentially.
-    'label_map': {1:  1,  2:  2,  3:  3,  4:  4, 5:5}
+    # If not specified, this just assumes category s start at 1 and increase sequentially.
+    'label_map': {1:  1,  2:  2,  3: 3, 4: 4,5: 5}
 })
 ul_aug_benchmark550 = ul_aug_dataset.copy({
     # Change Validation images and annotations to the testset when benchmark.
