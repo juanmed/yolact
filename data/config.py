@@ -105,12 +105,12 @@ ul_aug_dataset = Config({
     'name': 'Unloading Augmented',
 
     # Training images and annotations
-    'train_images': '/repos/dataset/stacked_random_testworks/all_merged/images/train/',
-    'train_info':   '/repos/dataset/stacked_random_testworks/all_merged/annotations/train.json',
+    'train_images': '/home/rise/Downloads/unloading_datasets/results/merged/images/',
+    'train_info':   '/home/rise/Downloads/unloading_datasets/results/merged/annotations/val.json',
 
     # Validation images and annotations.
-    'valid_images': '/repos/dataset/stacked_random_testworks/all_merged/images/train/',
-    'valid_info':   '/repos/dataset/stacked_random_testworks/all_merged/annotations/realval.json',
+    'valid_images': '/home/rise/Downloads/unloading_datasets/results/merged/images/',
+    'valid_info':   '/home/rise/Downloads/unloading_datasets/results/merged/annotations/val.json',
 
     # Change Validation images and annotations to the testset when benchmark.
     # 'valid_images': './data/coco_ul_aug/test/',
@@ -745,7 +745,7 @@ yolact_base_config = coco_base_config.copy({
     'mask_type': mask_type.lincomb,
     'mask_alpha': 6.125,
     'mask_proto_src': 0,
-    'mask_proto_net': [(256, 3, {'padding': 1})] * 3 + [(None, -2, {}), (256, 3, {'padding': 1})] + [(32, 1, {})],
+    'mask_proto_net': [(256, 3, {'padding': 1})] * 3 + [(None, -2, {}), (256, 3, {'padding': 1})]*2 + [(32, 1, {})],
     'mask_proto_normalize_emulate_roi_pooling': True,
 
     # Other stuff

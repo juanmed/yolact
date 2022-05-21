@@ -5,7 +5,7 @@ from utils.functions import MovingAverage, ProgressBar
 from layers.box_utils import jaccard, center_size, mask_iou
 from utils import timer
 from utils.functions import SavePath
-from layers.output_utils import postprocess, undo_image_transformation
+from layers.output_utils import display_lincomb, postprocess, undo_image_transformation
 import pycocotools
 
 from data import cfg, set_cfg, set_dataset
@@ -75,6 +75,8 @@ def parse_args(argv=None):
                         help='The output file for coco bbox results if --coco_results is set.')
     parser.add_argument('--mask_det_file', default='results/mask_detections.json', type=str,
                         help='The output file for coco mask results if --coco_results is set.')
+    parser.add_argument('--bbox_max_det_file', default='results/bbox_mask_detections_combined.json', type=str,
+                        help='The output file for coco mask and bbox results if --coco_results is set.')
     parser.add_argument('--config', default=None,
                         help='The config object to use.')
     parser.add_argument('--output_web_json', dest='output_web_json', action='store_true',
@@ -91,7 +93,7 @@ def parse_args(argv=None):
                         help='Do not sort images by hashed image ID.')
     parser.add_argument('--seed', default=None, type=int,
                         help='The seed to pass into random.seed. Note: this is only really for the shuffle and does not (I think) affect cuda stuff.')
-    parser.add_argument('--mask_proto_debug', default=False, dest='mask_proto_debug', action='store_true',
+    parser.add_argument('--mask_proto_debug', default=True, dest='mask_proto_debug', action='store_true',
                         help='Outputs stuff for scripts/compute_mask.py.')
     parser.add_argument('--no_crop', default=False, dest='crop', action='store_false',
                         help='Do not crop output masks with the predicted bounding box.')
@@ -114,8 +116,8 @@ def parse_args(argv=None):
     parser.add_argument('--emulate_playback', default=False, dest='emulate_playback', action='store_true',
                         help='When saving a video, emulate the framerate that you\'d get running in real-time mode.')
 
-    parser.set_defaults(no_bar=False, display=False, resume=False, output_coco_json=False, output_web_json=False, shuffle=False,
-                        benchmark=False, no_sort=False, no_hash=False, mask_proto_debug=False, crop=True, detect=False, display_fps=False,
+    parser.set_defaults(no_bar=False, display=False, display_lincomb=False, resume=False, output_coco_json=False, output_web_json=False, shuffle=False,
+                        benchmark=False, no_sort=False, no_hash=False, mask_proto_debug=True, crop=True, detect=False, display_fps=False,
                         emulate_playback=False)
 
     global args
@@ -302,6 +304,7 @@ class Detections:
     def __init__(self):
         self.bbox_data = []
         self.mask_data = []
+        self.bbox_mask_data=[]
 
     def add_bbox(self, image_id:int, category_id:int, bbox:list, score:float):
         """ Note that bbox should be a list or tuple of (x1, y1, x2, y2) """
@@ -329,6 +332,22 @@ class Detections:
             'score': float(score)
         })
     
+    def add_bbox_mask(self, image_id:int, category_id:int, segmentation:np.ndarray,  bbox:list, score:float):
+        """ The segmentation should be the full mask, the size of the image and with size [h, w].
+            Note that bbox should be a list or tuple of (x1, y1, x2, y2) """
+        bbox = [bbox[0], bbox[1], bbox[2]-bbox[0], bbox[3]-bbox[1]]
+        bbox = [round(float(x)*10)/10 for x in bbox]
+        rle = pycocotools.mask.encode(np.asfortranarray(segmentation.astype(np.uint8)))
+        rle['counts'] = rle['counts'].decode('ascii') # json.dump doesn't like bytes strings
+
+        self.bbox_mask_data.append({
+            'image_id': int(image_id),
+            'category_id': get_coco_cat(int(category_id)),
+            'bbox': bbox,
+            'segmentation': rle,
+            'score': float(score)
+        })
+
     def dump(self):
         dump_arguments = [
             (self.bbox_data, args.bbox_det_file),
@@ -339,6 +358,10 @@ class Detections:
             with open(path, 'w') as f:
                 json.dump(data, f)
     
+    def dump_bbox_mask(self):
+        with open(args.bbox_max_det_file, 'w') as f:
+            json.dump(self.bbox_mask_data, f)        
+
     def dump_web(self):
         """ Dumps it in the format for my web app. Warning: bad code ahead! """
         config_outs = ['preserve_aspect_ratio', 'use_prediction_module',
@@ -426,6 +449,7 @@ def prep_metrics(ap_data, dets, img, gt, gt_masks, h, w, num_crowd, image_id, de
                 if (boxes[i, 3] - boxes[i, 1]) * (boxes[i, 2] - boxes[i, 0]) > 0:
                     detections.add_bbox(image_id, classes[i], boxes[i,:],   box_scores[i])
                     detections.add_mask(image_id, classes[i], masks[i,:,:], mask_scores[i])
+                    detections.add_bbox_mask(image_id, classes[i], masks[i,:,:],  boxes[i,:], mask_scores[i])
             return
     
     with timer.env('Eval Setup'):
@@ -985,6 +1009,7 @@ def evaluate(net:Yolact, dataset, train_mode=False):
                     detections.dump_web()
                 else:
                     detections.dump()
+                    detections.dump_bbox_mask()
             else:
                 if not train_mode:
                     print('Saving data...')

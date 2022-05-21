@@ -43,5 +43,9 @@ python3 train.py \
  --save_folder=${YOLACT_SAVE_FOLDER}\
  --validation_epoch=200 \
  --save_interval=3000 \
- --resume=/repos/work/rise-yolact/weights/yolact_resnet50_max1024/yolact_resnet50_54_800000.pth \
- --start_iter=0
+ --resume=/home/rise/repos/yolact/weights/yolact_resnet50_max1024/yolact_plus_resnet50_54_800000.pth \
+ --start_iter=0 \
+ --lr=1e-5 \
+ --momentum=0.9 \
+ --decay=5e-4 \
+ --gamma=0.1
