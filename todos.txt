@@ -1,0 +1,15 @@
+augmentations.py:
+  class BackboneTransfoms:
+    - normalization of depth image: check if correct, and check normalization value
+  check classes ConvertCOlor, RandomContrast, RandomBrightness for errors in augmentation
+
+
+backbone.py:
+  - Make ResNetBackboneRGBXYZ with 6 channels instead of 4
+
+data/config.py
+  - check whether mean/std values are necessary
+  - import new ResNetBackboneRGBXYZ
+  - add resnet_rgbxyz_transform with appropriate parameters
+  - add yolact_resnet50_max1024_bgrxyz config
+
