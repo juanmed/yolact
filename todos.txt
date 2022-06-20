@@ -1,7 +1,17 @@
 augmentations.py:
-  class BackboneTransfoms:
+  -class BackboneTransfoms:
     - normalization of depth image: check if correct, and check normalization value
-  check classes ConvertCOlor, RandomContrast, RandomBrightness for errors in augmentation
+  -check classes ConvertCOlor, RandomContrast, RandomBrightness for errors in augmentation
+  - Class FastBasTransform()
+  	- add self.transform.channel_order = RGBXYZ
+  - class Compose()
+  	- __call__()
+  - class Lambda(): __call__
+  - class ConvertFromInts(): __call__
+  - classes ToAbsoluteCoords, ToPercentCoords,
+  - class Pad: expand_img, __call__
+  - class Resize
+  - class ConcatRGBD
 
 
 backbone.py:
@@ -12,4 +22,25 @@ data/config.py
   - import new ResNetBackboneRGBXYZ
   - add resnet_rgbxyz_transform with appropriate parameters
   - add yolact_resnet50_max1024_bgrxyz config
+  - add ul_bgrxyz_dataset configuration as copy of ul_aug_dataset
+     - this should have: train_color_images, train_depth_images and json files
+  - configure augmentation inside unloader_rgbdxyz_dataset definition q
 
+eval.py
+
+	-update evalimage() & evalimages() to accept the rgbxyz or whatever info it reuires
+		-https://github.com/rise-lab-skku/yolact/commit/31e169b2aad0d1060f17a5bdc1fb68552f937305
+
+
+data/coco.py
+	- check COCODetection (used in eval.py) to accept the rgbxyz images
+		- https://github.com/rise-lab-skku/yolact/commit/d8933c2b2260561ee8cf082d6c565a2df5a56d52
+	- look at _init__(), pull_item(), pull_depth(), enforce_size(),
+
+train.py
+	- update train() to accept rgbxyz images:
+		- https://github.com/rise-lab-skku/yolact/commit/3ad48b5a81c622ee6addb1540d7f1d9a28a54645
+
+
+layers/output_utils.py
+	-def undo_image_transformation()
